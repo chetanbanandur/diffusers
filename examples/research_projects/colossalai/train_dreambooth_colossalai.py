@@ -35,7 +35,7 @@ def import_model_class_from_model_name_or_path(pretrained_model_name_or_path: st
     text_encoder_config = PretrainedConfig.from_pretrained(
         pretrained_model_name_or_path,
         subfolder="text_encoder",
-        revision=args.revision,
+        variant=args.variant,
     )
     model_class = text_encoder_config.architectures[0]
 
@@ -61,11 +61,11 @@ def parse_args(input_args=None):
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
     parser.add_argument(
-        "--revision",
+        "--variant",
         type=str,
         default=None,
         required=False,
-        help="Revision of pretrained model identifier from huggingface.co/models.",
+        help="variant of pretrained model identifier from huggingface.co/models.",
     )
     parser.add_argument(
         "--tokenizer_name",
@@ -385,7 +385,7 @@ def main(args):
                 args.pretrained_model_name_or_path,
                 torch_dtype=torch_dtype,
                 safety_checker=None,
-                revision=args.revision,
+                variant=args.variant,
             )
             pipeline.set_progress_bar_config(disable=True)
 
@@ -434,7 +434,7 @@ def main(args):
         logger.info(f"Loading tokenizer from {args.tokenizer_name}", ranks=[0])
         tokenizer = AutoTokenizer.from_pretrained(
             args.tokenizer_name,
-            revision=args.revision,
+            variant=args.variant,
             use_fast=False,
         )
     elif args.pretrained_model_name_or_path:
@@ -442,7 +442,7 @@ def main(args):
         tokenizer = AutoTokenizer.from_pretrained(
             args.pretrained_model_name_or_path,
             subfolder="tokenizer",
-            revision=args.revision,
+            variant=args.variant,
             use_fast=False,
         )
         # import correct text encoder class
@@ -455,20 +455,20 @@ def main(args):
     text_encoder = text_encoder_cls.from_pretrained(
         args.pretrained_model_name_or_path,
         subfolder="text_encoder",
-        revision=args.revision,
+        variant=args.variant,
     )
 
     logger.info(f"Loading AutoencoderKL from {args.pretrained_model_name_or_path}", ranks=[0])
     vae = AutoencoderKL.from_pretrained(
         args.pretrained_model_name_or_path,
         subfolder="vae",
-        revision=args.revision,
+        variant=args.variant,
     )
 
     logger.info(f"Loading UNet2DConditionModel from {args.pretrained_model_name_or_path}", ranks=[0])
     with ColoInitContext(device=get_current_device()):
         unet = UNet2DConditionModel.from_pretrained(
-            args.pretrained_model_name_or_path, subfolder="unet", revision=args.revision, low_cpu_mem_usage=False
+            args.pretrained_model_name_or_path, subfolder="unet", variant=args.variant, low_cpu_mem_usage=False
         )
 
     vae.requires_grad_(False)
@@ -657,7 +657,7 @@ def main(args):
                     pipeline = DiffusionPipeline.from_pretrained(
                         args.pretrained_model_name_or_path,
                         unet=torch_unet,
-                        revision=args.revision,
+                        variant=args.variant,
                     )
                     save_path = os.path.join(args.output_dir, f"checkpoint-{global_step}")
                     pipeline.save_pretrained(save_path)
@@ -672,7 +672,7 @@ def main(args):
         pipeline = DiffusionPipeline.from_pretrained(
             args.pretrained_model_name_or_path,
             unet=unet,
-            revision=args.revision,
+            variant=args.variant,
         )
 
         pipeline.save_pretrained(args.output_dir)

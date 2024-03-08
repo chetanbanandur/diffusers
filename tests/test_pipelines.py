@@ -366,7 +366,7 @@ class CustomPipelineTests(unittest.TestCase):
 
     def test_load_custom_github(self):
         pipeline = DiffusionPipeline.from_pretrained(
-            "google/ddpm-cifar10-32", custom_pipeline="one_step_unet", custom_revision="main"
+            "google/ddpm-cifar10-32", custom_pipeline="one_step_unet", custom_variant="main"
         )
 
         # make sure that on "main" pipeline gives only ones because of: https://github.com/huggingface/diffusers/pull/1690
@@ -380,7 +380,7 @@ class CustomPipelineTests(unittest.TestCase):
         del sys.modules["diffusers_modules.git.one_step_unet"]
 
         pipeline = DiffusionPipeline.from_pretrained(
-            "google/ddpm-cifar10-32", custom_pipeline="one_step_unet", custom_revision="0.10.2"
+            "google/ddpm-cifar10-32", custom_pipeline="one_step_unet", custom_variant="0.10.2"
         )
         with torch.no_grad():
             output = pipeline()

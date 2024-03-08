@@ -105,9 +105,9 @@ class UNet2DConditionLoadersMixin:
             use_auth_token (`str` or *bool*, *optional*):
                 The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
                 when running `diffusers-cli login` (stored in `~/.huggingface`).
-            revision (`str`, *optional*, defaults to `"main"`):
+            variant (`str`, *optional*, defaults to `"main"`):
                 The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-                git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+                git-based system for storing models and other artifacts on huggingface.co, so `variant` can be any
                 identifier allowed by git.
             subfolder (`str`, *optional*, defaults to `""`):
                 In case the relevant files are located inside a subfolder of the model repo (either remote in
@@ -139,7 +139,7 @@ class UNet2DConditionLoadersMixin:
         proxies = kwargs.pop("proxies", None)
         local_files_only = kwargs.pop("local_files_only", HF_HUB_OFFLINE)
         use_auth_token = kwargs.pop("use_auth_token", None)
-        revision = kwargs.pop("revision", None)
+        variant = kwargs.pop("variant", None)
         subfolder = kwargs.pop("subfolder", None)
         weight_name = kwargs.pop("weight_name", None)
         use_safetensors = kwargs.pop("use_safetensors", None)
@@ -175,7 +175,7 @@ class UNet2DConditionLoadersMixin:
                         proxies=proxies,
                         local_files_only=local_files_only,
                         use_auth_token=use_auth_token,
-                        revision=revision,
+                        variant=variant,
                         subfolder=subfolder,
                         user_agent=user_agent,
                     )
@@ -195,7 +195,7 @@ class UNet2DConditionLoadersMixin:
                     proxies=proxies,
                     local_files_only=local_files_only,
                     use_auth_token=use_auth_token,
-                    revision=revision,
+                    variant=variant,
                     subfolder=subfolder,
                     user_agent=user_agent,
                 )

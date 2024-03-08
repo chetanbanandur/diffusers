@@ -75,7 +75,7 @@ class CheckpointMergerPipeline(DiffusionPipeline):
             **kwargs:
                 Supports all the default DiffusionPipeline.get_config_dict kwargs viz..
 
-                cache_dir, resume_download, force_download, proxies, local_files_only, use_auth_token, revision, torch_dtype, device_map.
+                cache_dir, resume_download, force_download, proxies, local_files_only, use_auth_token, variant, torch_dtype, device_map.
 
                 alpha - The interpolation parameter. Ranges from 0 to 1.  It affects the ratio in which the checkpoints are merged. A 0.8 alpha
                     would mean that the first model checkpoints would affect the final result far less than an alpha of 0.2
@@ -93,7 +93,7 @@ class CheckpointMergerPipeline(DiffusionPipeline):
         proxies = kwargs.pop("proxies", None)
         local_files_only = kwargs.pop("local_files_only", False)
         use_auth_token = kwargs.pop("use_auth_token", None)
-        revision = kwargs.pop("revision", None)
+        variant = kwargs.pop("variant", None)
         torch_dtype = kwargs.pop("torch_dtype", None)
         device_map = kwargs.pop("device_map", None)
 
@@ -130,7 +130,7 @@ class CheckpointMergerPipeline(DiffusionPipeline):
                 proxies=proxies,
                 local_files_only=local_files_only,
                 use_auth_token=use_auth_token,
-                revision=revision,
+                variant=variant,
             )
             config_dicts.append(config_dict)
 
@@ -166,7 +166,7 @@ class CheckpointMergerPipeline(DiffusionPipeline):
                     proxies=proxies,
                     local_files_only=local_files_only,
                     use_auth_token=use_auth_token,
-                    revision=revision,
+                    variant=variant,
                     allow_patterns=allow_patterns,
                     user_agent=user_agent,
                 )

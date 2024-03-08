@@ -232,9 +232,9 @@ class FlaxDiffusionPipeline(ConfigMixin):
             use_auth_token (`str` or *bool*, *optional*):
                 The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
                 when running `huggingface-cli login` (stored in `~/.huggingface`).
-            revision (`str`, *optional*, defaults to `"main"`):
+            variant (`str`, *optional*, defaults to `"main"`):
                 The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-                git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+                git-based system for storing models and other artifacts on huggingface.co, so `variant` can be any
                 identifier allowed by git.
             mirror (`str`, *optional*):
                 Mirror source to accelerate downloads in China. If you are from China and have an accessibility
@@ -270,7 +270,7 @@ class FlaxDiffusionPipeline(ConfigMixin):
         >>> # see more in [the documentation](https://huggingface.co/docs/hub/security-tokens)
         >>> pipeline, params = FlaxDiffusionPipeline.from_pretrained(
         ...     "runwayml/stable-diffusion-v1-5",
-        ...     revision="bf16",
+        ...     variant="bf16",
         ...     dtype=jnp.bfloat16,
         ... )
 
@@ -284,7 +284,7 @@ class FlaxDiffusionPipeline(ConfigMixin):
         ... )
 
         >>> dpm_pipe, dpm_params = FlaxStableDiffusionPipeline.from_pretrained(
-        ...     model_id, revision="bf16", dtype=jnp.bfloat16, scheduler=dpmpp
+        ...     model_id, variant="bf16", dtype=jnp.bfloat16, scheduler=dpmpp
         ... )
         >>> dpm_params["scheduler"] = dpmpp_state
         ```
@@ -294,7 +294,7 @@ class FlaxDiffusionPipeline(ConfigMixin):
         proxies = kwargs.pop("proxies", None)
         local_files_only = kwargs.pop("local_files_only", False)
         use_auth_token = kwargs.pop("use_auth_token", None)
-        revision = kwargs.pop("revision", None)
+        variant = kwargs.pop("variant", None)
         from_pt = kwargs.pop("from_pt", False)
         dtype = kwargs.pop("dtype", None)
 
@@ -308,7 +308,7 @@ class FlaxDiffusionPipeline(ConfigMixin):
                 proxies=proxies,
                 local_files_only=local_files_only,
                 use_auth_token=use_auth_token,
-                revision=revision,
+                variant=variant,
             )
             # make sure we only download sub-folders and `diffusers` filenames
             folder_names = [k for k in config_dict.keys() if not k.startswith("_")]
@@ -339,7 +339,7 @@ class FlaxDiffusionPipeline(ConfigMixin):
                 proxies=proxies,
                 local_files_only=local_files_only,
                 use_auth_token=use_auth_token,
-                revision=revision,
+                variant=variant,
                 allow_patterns=allow_patterns,
                 ignore_patterns=ignore_patterns,
                 user_agent=user_agent,
@@ -510,7 +510,7 @@ class FlaxDiffusionPipeline(ConfigMixin):
         ... )
 
         >>> text2img = FlaxStableDiffusionPipeline.from_pretrained(
-        ...     "runwayml/stable-diffusion-v1-5", revision="bf16", dtype=jnp.bfloat16
+        ...     "runwayml/stable-diffusion-v1-5", variant="bf16", dtype=jnp.bfloat16
         ... )
         >>> img2img = FlaxStableDiffusionImg2ImgPipeline(**text2img.components)
         ```

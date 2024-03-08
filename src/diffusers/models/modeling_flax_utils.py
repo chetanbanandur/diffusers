@@ -24,7 +24,7 @@ from flax.core.frozen_dict import FrozenDict, unfreeze
 from flax.serialization import from_bytes, to_bytes
 from flax.traverse_util import flatten_dict, unflatten_dict
 from huggingface_hub import hf_hub_download
-from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError, RevisionNotFoundError
+from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError, variantNotFoundError
 from requests import HTTPError
 
 from .. import __version__, is_torch_available
@@ -247,9 +247,9 @@ class FlaxModelMixin:
                 'http://hostname': 'foo.bar:4012'}`. The proxies are used on each request.
             local_files_only(`bool`, *optional*, defaults to `False`):
                 Whether or not to only look at local files (i.e., do not try to download the model).
-            revision (`str`, *optional*, defaults to `"main"`):
+            variant (`str`, *optional*, defaults to `"main"`):
                 The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-                git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+                git-based system for storing models and other artifacts on huggingface.co, so `variant` can be any
                 identifier allowed by git.
             from_pt (`bool`, *optional*, defaults to `False`):
                 Load the model weights from a PyTorch checkpoint save file.
@@ -285,7 +285,7 @@ class FlaxModelMixin:
         proxies = kwargs.pop("proxies", None)
         local_files_only = kwargs.pop("local_files_only", False)
         use_auth_token = kwargs.pop("use_auth_token", None)
-        revision = kwargs.pop("revision", None)
+        variant = kwargs.pop("variant", None)
         subfolder = kwargs.pop("subfolder", None)
 
         user_agent = {
@@ -305,7 +305,7 @@ class FlaxModelMixin:
             proxies=proxies,
             local_files_only=local_files_only,
             use_auth_token=use_auth_token,
-            revision=revision,
+            variant=variant,
             subfolder=subfolder,
             # model args
             dtype=dtype,
@@ -352,7 +352,7 @@ class FlaxModelMixin:
                     use_auth_token=use_auth_token,
                     user_agent=user_agent,
                     subfolder=subfolder,
-                    revision=revision,
+                    variant=variant,
                 )
 
             except RepositoryNotFoundError:
@@ -362,11 +362,11 @@ class FlaxModelMixin:
                     "token having permission to this repo with `use_auth_token` or log in with `huggingface-cli "
                     "login`."
                 )
-            except RevisionNotFoundError:
+            except variantNotFoundError:
                 raise EnvironmentError(
-                    f"{revision} is not a valid git identifier (branch name, tag name or commit id) that exists for "
+                    f"{variant} is not a valid git identifier (branch name, tag name or commit id) that exists for "
                     "this model name. Check the model page at "
-                    f"'https://huggingface.co/{pretrained_model_name_or_path}' for available revisions."
+                    f"'https://huggingface.co/{pretrained_model_name_or_path}' for available variants."
                 )
             except EntryNotFoundError:
                 raise EnvironmentError(

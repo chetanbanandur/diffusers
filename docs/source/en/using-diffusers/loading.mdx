@@ -538,24 +538,24 @@ In the case of `runwayml/stable-diffusion-v1-5` the `model_index.json` is theref
 <!--
 TODO(Patrick) - Make sure to uncomment this part as soon as things are deprecated.
 
-#### Using `revision` to load pipeline variants is deprecated
+#### Using `variant` to load pipeline variants is deprecated
 
-Previously the `revision` argument of [`DiffusionPipeline.from_pretrained`] was heavily used to 
+Previously the `variant` argument of [`DiffusionPipeline.from_pretrained`] was heavily used to 
 load model variants, e.g.:
 
 ```python
 from diffusers import DiffusionPipeline
 
-pipe = DiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", revision="fp16")
+pipe = DiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", variant="fp16")
 ```
 
-However, this behavior is now deprecated since the "revision" argument should (just as it's done in GitHub) better be used to load model checkpoints from a specific commit or branch in development.
+However, this behavior is now deprecated since the "variant" argument should (just as it's done in GitHub) better be used to load model checkpoints from a specific commit or branch in development.
 
 The above example is therefore deprecated and won't be supported anymore for `diffusers >= 1.0.0`.
 
 <Tip warning={true}>
 
-If you load diffusers pipelines or models with `revision="fp16"` or `revision="non_ema"`, 
+If you load diffusers pipelines or models with `variant="fp16"` or `variant="non_ema"`, 
 please make sure to update to code and use `variant="fp16"` or `variation="non_ema"` respectively
 instead.
 

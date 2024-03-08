@@ -60,11 +60,11 @@ def parse_args():
         help="Path to pretrained vae or vae identifier from huggingface.co/models.",
     )
     parser.add_argument(
-        "--revision",
+        "--variant",
         type=str,
         default=None,
         required=False,
-        help="Revision of pretrained model identifier from huggingface.co/models.",
+        help="variant of pretrained model identifier from huggingface.co/models.",
     )
     parser.add_argument(
         "--tokenizer_name",
@@ -360,7 +360,7 @@ def main():
 
         if cur_class_images < args.num_class_images:
             pipeline, params = FlaxStableDiffusionPipeline.from_pretrained(
-                args.pretrained_model_name_or_path, safety_checker=None, revision=args.revision
+                args.pretrained_model_name_or_path, safety_checker=None, variant=args.variant
             )
             pipeline.set_progress_bar_config(disable=True)
 
@@ -413,7 +413,7 @@ def main():
         tokenizer = CLIPTokenizer.from_pretrained(args.tokenizer_name)
     elif args.pretrained_model_name_or_path:
         tokenizer = CLIPTokenizer.from_pretrained(
-            args.pretrained_model_name_or_path, subfolder="tokenizer", revision=args.revision
+            args.pretrained_model_name_or_path, subfolder="tokenizer", variant=args.variant
         )
     else:
         raise NotImplementedError("No tokenizer specified!")
@@ -475,11 +475,11 @@ def main():
         # TODO(patil-suraj): Upload flax weights for the VAE
         vae_arg, vae_kwargs = (args.pretrained_vae_name_or_path, {"from_pt": True})
     else:
-        vae_arg, vae_kwargs = (args.pretrained_model_name_or_path, {"subfolder": "vae", "revision": args.revision})
+        vae_arg, vae_kwargs = (args.pretrained_model_name_or_path, {"subfolder": "vae", "variant": args.variant})
 
     # Load models and create wrapper for stable diffusion
     text_encoder = FlaxCLIPTextModel.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="text_encoder", dtype=weight_dtype, revision=args.revision
+        args.pretrained_model_name_or_path, subfolder="text_encoder", dtype=weight_dtype, variant=args.variant
     )
     vae, vae_params = FlaxAutoencoderKL.from_pretrained(
         vae_arg,
@@ -487,7 +487,7 @@ def main():
         **vae_kwargs,
     )
     unet, unet_params = FlaxUNet2DConditionModel.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="unet", dtype=weight_dtype, revision=args.revision
+        args.pretrained_model_name_or_path, subfolder="unet", dtype=weight_dtype, variant=args.variant
     )
 
     # Optimization

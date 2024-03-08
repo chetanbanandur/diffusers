@@ -22,7 +22,7 @@ from typing import Callable, List, Optional, Tuple, Union
 
 import torch
 from huggingface_hub import hf_hub_download
-from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError, RevisionNotFoundError
+from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError, variantNotFoundError
 from packaging import version
 from requests import HTTPError
 from torch import Tensor, device
@@ -30,7 +30,7 @@ from torch import Tensor, device
 from .. import __version__
 from ..utils import (
     CONFIG_NAME,
-    DEPRECATED_REVISION_ARGS,
+    DEPRECATED_variant_ARGS,
     DIFFUSERS_CACHE,
     FLAX_WEIGHTS_NAME,
     HF_HUB_OFFLINE,
@@ -362,9 +362,9 @@ class ModelMixin(torch.nn.Module):
             use_auth_token (`str` or *bool*, *optional*):
                 The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
                 when running `diffusers-cli login` (stored in `~/.huggingface`).
-            revision (`str`, *optional*, defaults to `"main"`):
+            variant (`str`, *optional*, defaults to `"main"`):
                 The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-                git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+                git-based system for storing models and other artifacts on huggingface.co, so `variant` can be any
                 identifier allowed by git.
             from_flax (`bool`, *optional*, defaults to `False`):
                 Load the model weights from a Flax checkpoint save file.
@@ -421,7 +421,7 @@ class ModelMixin(torch.nn.Module):
         output_loading_info = kwargs.pop("output_loading_info", False)
         local_files_only = kwargs.pop("local_files_only", HF_HUB_OFFLINE)
         use_auth_token = kwargs.pop("use_auth_token", None)
-        revision = kwargs.pop("revision", None)
+        variant = kwargs.pop("variant", None)
         torch_dtype = kwargs.pop("torch_dtype", None)
         subfolder = kwargs.pop("subfolder", None)
         device_map = kwargs.pop("device_map", None)
@@ -493,7 +493,7 @@ class ModelMixin(torch.nn.Module):
             proxies=proxies,
             local_files_only=local_files_only,
             use_auth_token=use_auth_token,
-            revision=revision,
+            variant=variant,
             subfolder=subfolder,
             device_map=device_map,
             user_agent=user_agent,
@@ -512,7 +512,7 @@ class ModelMixin(torch.nn.Module):
                 proxies=proxies,
                 local_files_only=local_files_only,
                 use_auth_token=use_auth_token,
-                revision=revision,
+                variant=variant,
                 subfolder=subfolder,
                 user_agent=user_agent,
                 commit_hash=commit_hash,
@@ -535,7 +535,7 @@ class ModelMixin(torch.nn.Module):
                         proxies=proxies,
                         local_files_only=local_files_only,
                         use_auth_token=use_auth_token,
-                        revision=revision,
+                        variant=variant,
                         subfolder=subfolder,
                         user_agent=user_agent,
                         commit_hash=commit_hash,
@@ -554,7 +554,7 @@ class ModelMixin(torch.nn.Module):
                     proxies=proxies,
                     local_files_only=local_files_only,
                     use_auth_token=use_auth_token,
-                    revision=revision,
+                    variant=variant,
                     subfolder=subfolder,
                     user_agent=user_agent,
                     commit_hash=commit_hash,
@@ -796,7 +796,7 @@ def _get_model_file(
     local_files_only,
     use_auth_token,
     user_agent,
-    revision,
+    variant,
     commit_hash=None,
 ):
     pretrained_model_name_or_path = str(pretrained_model_name_or_path)
@@ -819,14 +819,14 @@ def _get_model_file(
     else:
         # 1. First check if deprecated way of loading from branches is used
         if (
-            revision in DEPRECATED_REVISION_ARGS
+            variant in DEPRECATED_variant_ARGS
             and (weights_name == WEIGHTS_NAME or weights_name == SAFETENSORS_WEIGHTS_NAME)
             and version.parse(version.parse(__version__).base_version) >= version.parse("0.17.0")
         ):
             try:
                 model_file = hf_hub_download(
                     pretrained_model_name_or_path,
-                    filename=_add_variant(weights_name, revision),
+                    filename=_add_variant(weights_name, variant),
                     cache_dir=cache_dir,
                     force_download=force_download,
                     proxies=proxies,
@@ -835,16 +835,16 @@ def _get_model_file(
                     use_auth_token=use_auth_token,
                     user_agent=user_agent,
                     subfolder=subfolder,
-                    revision=revision or commit_hash,
+                    variant=variant or commit_hash,
                 )
                 warnings.warn(
-                    f"Loading the variant {revision} from {pretrained_model_name_or_path} via `revision='{revision}'` is deprecated. Loading instead from `revision='main'` with `variant={revision}`. Loading model variants via `revision='{revision}'` will be removed in diffusers v1. Please use `variant='{revision}'` instead.",
+                    f"Loading the variant {variant} from {pretrained_model_name_or_path} via `variant='{variant}'` is deprecated. Loading instead from `variant='main'` with `variant={variant}`. Loading model variants via `variant='{variant}'` will be removed in diffusers v1. Please use `variant='{variant}'` instead.",
                     FutureWarning,
                 )
                 return model_file
             except:  # noqa: E722
                 warnings.warn(
-                    f"You are loading the variant {revision} from {pretrained_model_name_or_path} via `revision='{revision}'`. This behavior is deprecated and will be removed in diffusers v1. One should use `variant='{revision}'` instead. However, it appears that {pretrained_model_name_or_path} currently does not have a {_add_variant(weights_name, revision)} file in the 'main' branch of {pretrained_model_name_or_path}. \n The Diffusers team and community would be very grateful if you could open an issue: https://github.com/huggingface/diffusers/issues/new with the title '{pretrained_model_name_or_path} is missing {_add_variant(weights_name, revision)}' so that the correct variant file can be added.",
+                    f"You are loading the variant {variant} from {pretrained_model_name_or_path} via `variant='{variant}'`. This behavior is deprecated and will be removed in diffusers v1. One should use `variant='{variant}'` instead. However, it appears that {pretrained_model_name_or_path} currently does not have a {_add_variant(weights_name, variant)} file in the 'main' branch of {pretrained_model_name_or_path}. \n The Diffusers team and community would be very grateful if you could open an issue: https://github.com/huggingface/diffusers/issues/new with the title '{pretrained_model_name_or_path} is missing {_add_variant(weights_name, variant)}' so that the correct variant file can be added.",
                     FutureWarning,
                 )
         try:
@@ -860,7 +860,7 @@ def _get_model_file(
                 use_auth_token=use_auth_token,
                 user_agent=user_agent,
                 subfolder=subfolder,
-                revision=revision or commit_hash,
+                variant=variant or commit_hash,
             )
             return model_file
 
@@ -871,11 +871,11 @@ def _get_model_file(
                 "token having permission to this repo with `use_auth_token` or log in with `huggingface-cli "
                 "login`."
             )
-        except RevisionNotFoundError:
+        except variantNotFoundError:
             raise EnvironmentError(
-                f"{revision} is not a valid git identifier (branch name, tag name or commit id) that exists for "
+                f"{variant} is not a valid git identifier (branch name, tag name or commit id) that exists for "
                 "this model name. Check the model page at "
-                f"'https://huggingface.co/{pretrained_model_name_or_path}' for available revisions."
+                f"'https://huggingface.co/{pretrained_model_name_or_path}' for available variants."
             )
         except EntryNotFoundError:
             raise EnvironmentError(

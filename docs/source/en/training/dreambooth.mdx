@@ -271,7 +271,7 @@ from diffusers import DiffusionPipeline, UNet2DConditionModel
 from transformers import CLIPTextModel
 import torch
 
-# Load the pipeline with the same arguments (model, revision) that were used for training
+# Load the pipeline with the same arguments (model, variant) that were used for training
 model_id = "CompVis/stable-diffusion-v1-4"
 
 unet = UNet2DConditionModel.from_pretrained("/sddata/dreambooth/daruma-v2-1/checkpoint-100/unet")
@@ -292,7 +292,7 @@ If you have **`"accelerate<0.16.0"`** installed, you need to convert it to an in
 from accelerate import Accelerator
 from diffusers import DiffusionPipeline
 
-# Load the pipeline with the same arguments (model, revision) that were used for training
+# Load the pipeline with the same arguments (model, variant) that were used for training
 model_id = "CompVis/stable-diffusion-v1-4"
 pipeline = DiffusionPipeline.from_pretrained(model_id)
 

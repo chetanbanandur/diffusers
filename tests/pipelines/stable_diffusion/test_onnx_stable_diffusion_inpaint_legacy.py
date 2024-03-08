@@ -69,7 +69,7 @@ class StableDiffusionOnnxInpaintLegacyPipelineIntegrationTests(unittest.TestCase
         # using the PNDM scheduler by default
         pipe = OnnxStableDiffusionInpaintPipelineLegacy.from_pretrained(
             "CompVis/stable-diffusion-v1-4",
-            revision="onnx",
+            variant="onnx",
             safety_checker=None,
             feature_extractor=None,
             provider=self.gpu_provider,

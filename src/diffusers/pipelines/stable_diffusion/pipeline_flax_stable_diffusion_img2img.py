@@ -72,7 +72,7 @@ EXAMPLE_DOC_STRING = """
 
         >>> pipeline, params = FlaxStableDiffusionImg2ImgPipeline.from_pretrained(
         ...     "CompVis/stable-diffusion-v1-4",
-        ...     revision="flax",
+        ...     variant="flax",
         ...     dtype=jnp.bfloat16,
         ... )
 

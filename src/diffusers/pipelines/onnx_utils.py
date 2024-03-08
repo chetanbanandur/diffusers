@@ -134,7 +134,7 @@ class OnnxRuntimeModel:
         cls,
         model_id: Union[str, Path],
         use_auth_token: Optional[Union[bool, str, None]] = None,
-        revision: Optional[Union[str, None]] = None,
+        variant: Optional[Union[str, None]] = None,
         force_download: bool = False,
         cache_dir: Optional[str] = None,
         file_name: Optional[str] = None,
@@ -150,8 +150,8 @@ class OnnxRuntimeModel:
                 Directory from which to load
             use_auth_token (`str` or `bool`):
                 Is needed to load models from a private or gated repository
-            revision (`str`):
-                Revision is the specific model version to use. It can be a branch name, a tag name, or a commit id
+            variant (`str`):
+                variant is the specific model version to use. It can be a branch name, a tag name, or a commit id
             cache_dir (`Union[str, Path]`, *optional*):
                 Path to a directory in which a downloaded pretrained model configuration should be cached if the
                 standard cache should not be used.
@@ -180,7 +180,7 @@ class OnnxRuntimeModel:
                 repo_id=model_id,
                 filename=model_file_name,
                 use_auth_token=use_auth_token,
-                revision=revision,
+                variant=variant,
                 cache_dir=cache_dir,
                 force_download=force_download,
             )
@@ -198,13 +198,13 @@ class OnnxRuntimeModel:
         cache_dir: Optional[str] = None,
         **model_kwargs,
     ):
-        revision = None
+        variant = None
         if len(str(model_id).split("@")) == 2:
-            model_id, revision = model_id.split("@")
+            model_id, variant = model_id.split("@")
 
         return cls._from_pretrained(
             model_id=model_id,
-            revision=revision,
+            variant=variant,
             cache_dir=cache_dir,
             force_download=force_download,
             use_auth_token=use_auth_token,

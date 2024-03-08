@@ -118,7 +118,7 @@ import torch
 
 pipe = DiffusionPipeline.from_pretrained(
     "CompVis/stable-diffusion-v1-4",
-    revision='fp16',
+    variant='fp16',
     torch_dtype=torch.float16,
     safety_checker=None,  # Very important for videos...lots of false positives while interpolating
     custom_pipeline="interpolate_stable_diffusion",
@@ -159,7 +159,7 @@ def download_image(url):
     response = requests.get(url)
     return PIL.Image.open(BytesIO(response.content)).convert("RGB")
 
-pipe = DiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", custom_pipeline="stable_diffusion_mega", torch_dtype=torch.float16, revision="fp16")
+pipe = DiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", custom_pipeline="stable_diffusion_mega", torch_dtype=torch.float16, variant="fp16")
 pipe.to("cuda")
 pipe.enable_attention_slicing()
 
@@ -235,7 +235,7 @@ import torch
 pipe = DiffusionPipeline.from_pretrained(
     'CompVis/stable-diffusion-v1-4',
     custom_pipeline="lpw_stable_diffusion_onnx",
-    revision="onnx",
+    variant="onnx",
     provider="CUDAExecutionProvider"
 )
 

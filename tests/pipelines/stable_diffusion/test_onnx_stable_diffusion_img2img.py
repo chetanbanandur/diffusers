@@ -174,7 +174,7 @@ class OnnxStableDiffusionImg2ImgPipelineIntegrationTests(unittest.TestCase):
         # using the PNDM scheduler by default
         pipe = OnnxStableDiffusionImg2ImgPipeline.from_pretrained(
             "CompVis/stable-diffusion-v1-4",
-            revision="onnx",
+            variant="onnx",
             safety_checker=None,
             feature_extractor=None,
             provider=self.gpu_provider,
@@ -210,11 +210,11 @@ class OnnxStableDiffusionImg2ImgPipelineIntegrationTests(unittest.TestCase):
         )
         init_image = init_image.resize((768, 512))
         lms_scheduler = LMSDiscreteScheduler.from_pretrained(
-            "runwayml/stable-diffusion-v1-5", subfolder="scheduler", revision="onnx"
+            "runwayml/stable-diffusion-v1-5", subfolder="scheduler", variant="onnx"
         )
         pipe = OnnxStableDiffusionImg2ImgPipeline.from_pretrained(
             "runwayml/stable-diffusion-v1-5",
-            revision="onnx",
+            variant="onnx",
             scheduler=lms_scheduler,
             safety_checker=None,
             feature_extractor=None,

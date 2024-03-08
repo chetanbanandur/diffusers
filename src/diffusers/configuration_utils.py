@@ -27,7 +27,7 @@ from typing import Any, Dict, Tuple, Union
 
 import numpy as np
 from huggingface_hub import hf_hub_download
-from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError, RevisionNotFoundError
+from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError, variantNotFoundError
 from requests import HTTPError
 
 from . import __version__
@@ -276,9 +276,9 @@ class ConfigMixin:
             use_auth_token (`str` or *bool*, *optional*):
                 The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
                 when running `transformers-cli login` (stored in `~/.huggingface`).
-            revision (`str`, *optional*, defaults to `"main"`):
+            variant (`str`, *optional*, defaults to `"main"`):
                 The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-                git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+                git-based system for storing models and other artifacts on huggingface.co, so `variant` can be any
                 identifier allowed by git.
             subfolder (`str`, *optional*, defaults to `""`):
                 In case the relevant files are located inside a subfolder of the model repo (either remote in
@@ -308,7 +308,7 @@ class ConfigMixin:
         proxies = kwargs.pop("proxies", None)
         use_auth_token = kwargs.pop("use_auth_token", None)
         local_files_only = kwargs.pop("local_files_only", False)
-        revision = kwargs.pop("revision", None)
+        variant = kwargs.pop("variant", None)
         _ = kwargs.pop("mirror", None)
         subfolder = kwargs.pop("subfolder", None)
         user_agent = kwargs.pop("user_agent", {})
@@ -352,7 +352,7 @@ class ConfigMixin:
                     use_auth_token=use_auth_token,
                     user_agent=user_agent,
                     subfolder=subfolder,
-                    revision=revision,
+                    variant=variant,
                 )
             except RepositoryNotFoundError:
                 raise EnvironmentError(
@@ -361,11 +361,11 @@ class ConfigMixin:
                     " token having permission to this repo with `use_auth_token` or log in with `huggingface-cli"
                     " login`."
                 )
-            except RevisionNotFoundError:
+            except variantNotFoundError:
                 raise EnvironmentError(
-                    f"{revision} is not a valid git identifier (branch name, tag name or commit id) that exists for"
+                    f"{variant} is not a valid git identifier (branch name, tag name or commit id) that exists for"
                     " this model name. Check the model page at"
-                    f" 'https://huggingface.co/{pretrained_model_name_or_path}' for available revisions."
+                    f" 'https://huggingface.co/{pretrained_model_name_or_path}' for available variants."
                 )
             except EntryNotFoundError:
                 raise EnvironmentError(

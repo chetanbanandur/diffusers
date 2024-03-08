@@ -74,7 +74,7 @@ def log_validation(vae, text_encoder, tokenizer, unet, controlnet, args, acceler
         unet=unet,
         controlnet=controlnet,
         safety_checker=None,
-        revision=args.revision,
+        variant=args.variant,
         torch_dtype=weight_dtype,
     )
     pipeline.scheduler = UniPCMultistepScheduler.from_config(pipeline.scheduler.config)
@@ -158,11 +158,11 @@ def log_validation(vae, text_encoder, tokenizer, unet, controlnet, args, acceler
             logger.warn(f"image logging not implemented for {tracker.name}")
 
 
-def import_model_class_from_model_name_or_path(pretrained_model_name_or_path: str, revision: str):
+def import_model_class_from_model_name_or_path(pretrained_model_name_or_path: str, variant: str):
     text_encoder_config = PretrainedConfig.from_pretrained(
         pretrained_model_name_or_path,
         subfolder="text_encoder",
-        revision=revision,
+        variant=variant,
     )
     model_class = text_encoder_config.architectures[0]
 
@@ -195,12 +195,12 @@ def parse_args(input_args=None):
         " If not specified controlnet weights are initialized from unet.",
     )
     parser.add_argument(
-        "--revision",
+        "--variant",
         type=str,
         default=None,
         required=False,
         help=(
-            "Revision of pretrained model identifier from huggingface.co/models. Trainable model components should be"
+            "variant of pretrained model identifier from huggingface.co/models. Trainable model components should be"
             " float32 precision."
         ),
     )
@@ -722,26 +722,26 @@ def main(args):
 
     # Load the tokenizer
     if args.tokenizer_name:
-        tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name, revision=args.revision, use_fast=False)
+        tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name, variant=args.variant, use_fast=False)
     elif args.pretrained_model_name_or_path:
         tokenizer = AutoTokenizer.from_pretrained(
             args.pretrained_model_name_or_path,
             subfolder="tokenizer",
-            revision=args.revision,
+            variant=args.variant,
             use_fast=False,
         )
 
     # import correct text encoder class
-    text_encoder_cls = import_model_class_from_model_name_or_path(args.pretrained_model_name_or_path, args.revision)
+    text_encoder_cls = import_model_class_from_model_name_or_path(args.pretrained_model_name_or_path, args.variant)
 
     # Load scheduler and models
     noise_scheduler = DDPMScheduler.from_pretrained(args.pretrained_model_name_or_path, subfolder="scheduler")
     text_encoder = text_encoder_cls.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="text_encoder", revision=args.revision
+        args.pretrained_model_name_or_path, subfolder="text_encoder", variant=args.variant
     )
-    vae = AutoencoderKL.from_pretrained(args.pretrained_model_name_or_path, subfolder="vae", revision=args.revision)
+    vae = AutoencoderKL.from_pretrained(args.pretrained_model_name_or_path, subfolder="vae", variant=args.variant)
     unet = UNet2DConditionModel.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="unet", revision=args.revision
+        args.pretrained_model_name_or_path, subfolder="unet", variant=args.variant
     )
 
     if args.controlnet_model_name_or_path:

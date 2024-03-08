@@ -698,7 +698,7 @@ class StableDiffusionPipelineSlowTests(unittest.TestCase):
     def test_stable_diffusion_vae_tiling(self):
         torch.cuda.reset_peak_memory_stats()
         model_id = "CompVis/stable-diffusion-v1-4"
-        pipe = StableDiffusionPipeline.from_pretrained(model_id, revision="fp16", torch_dtype=torch.float16)
+        pipe = StableDiffusionPipeline.from_pretrained(model_id, variant="fp16", torch_dtype=torch.float16)
         pipe.set_progress_bar_config(disable=None)
         pipe.enable_attention_slicing()
         pipe.unet = pipe.unet.to(memory_format=torch.channels_last)

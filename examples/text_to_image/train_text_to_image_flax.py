@@ -49,11 +49,11 @@ def parse_args():
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
     parser.add_argument(
-        "--revision",
+        "--variant",
         type=str,
         default=None,
         required=False,
-        help="Revision of pretrained model identifier from huggingface.co/models.",
+        help="variant of pretrained model identifier from huggingface.co/models.",
     )
     parser.add_argument(
         "--dataset_name",
@@ -394,16 +394,16 @@ def main():
 
     # Load models and create wrapper for stable diffusion
     tokenizer = CLIPTokenizer.from_pretrained(
-        args.pretrained_model_name_or_path, revision=args.revision, subfolder="tokenizer"
+        args.pretrained_model_name_or_path, variant=args.variant, subfolder="tokenizer"
     )
     text_encoder = FlaxCLIPTextModel.from_pretrained(
-        args.pretrained_model_name_or_path, revision=args.revision, subfolder="text_encoder", dtype=weight_dtype
+        args.pretrained_model_name_or_path, variant=args.variant, subfolder="text_encoder", dtype=weight_dtype
     )
     vae, vae_params = FlaxAutoencoderKL.from_pretrained(
-        args.pretrained_model_name_or_path, revision=args.revision, subfolder="vae", dtype=weight_dtype
+        args.pretrained_model_name_or_path, variant=args.variant, subfolder="vae", dtype=weight_dtype
     )
     unet, unet_params = FlaxUNet2DConditionModel.from_pretrained(
-        args.pretrained_model_name_or_path, revision=args.revision, subfolder="unet", dtype=weight_dtype
+        args.pretrained_model_name_or_path, variant=args.variant, subfolder="unet", dtype=weight_dtype
     )
 
     # Optimization

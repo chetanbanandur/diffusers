@@ -62,11 +62,11 @@ def parse_args():
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
     parser.add_argument(
-        "--revision",
+        "--variant",
         type=str,
         default=None,
         required=False,
-        help="Revision of pretrained model identifier from huggingface.co/models.",
+        help="variant of pretrained model identifier from huggingface.co/models.",
     )
     parser.add_argument(
         "--dataset_name",
@@ -206,12 +206,12 @@ def parse_args():
     )
     parser.add_argument("--use_ema", action="store_true", help="Whether to use EMA model.")
     parser.add_argument(
-        "--non_ema_revision",
+        "--non_ema_variant",
         type=str,
         default=None,
         required=False,
         help=(
-            "Revision of pretrained non-ema model identifier. Must be a branch, tag or git identifier of the local or"
+            "variant of pretrained non-ema model identifier. Must be a branch, tag or git identifier of the local or"
             " remote repository specified with --pretrained_model_name_or_path."
         ),
     )
@@ -308,9 +308,9 @@ def parse_args():
     if args.dataset_name is None and args.train_data_dir is None:
         raise ValueError("Need either a dataset name or a training folder.")
 
-    # default to using the same revision for the non-ema model if not specified
-    if args.non_ema_revision is None:
-        args.non_ema_revision = args.revision
+    # default to using the same variant for the non-ema model if not specified
+    if args.non_ema_variant is None:
+        args.non_ema_variant = args.variant
 
     return args
 
@@ -333,12 +333,12 @@ dataset_name_mapping = {
 def main():
     args = parse_args()
 
-    if args.non_ema_revision is not None:
+    if args.non_ema_variant is not None:
         deprecate(
-            "non_ema_revision!=None",
+            "non_ema_variant!=None",
             "0.15.0",
             message=(
-                "Downloading 'non_ema' weights from revision branches of the Hub is deprecated. Please make sure to"
+                "Downloading 'non_ema' weights from variant branches of the Hub is deprecated. Please make sure to"
                 " use `--variant=non_ema` instead."
             ),
         )
@@ -395,14 +395,14 @@ def main():
     # Load scheduler, tokenizer and models.
     noise_scheduler = DDPMScheduler.from_pretrained(args.pretrained_model_name_or_path, subfolder="scheduler")
     tokenizer = CLIPTokenizer.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="tokenizer", revision=args.revision
+        args.pretrained_model_name_or_path, subfolder="tokenizer", variant=args.variant
     )
     text_encoder = CLIPTextModel.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="text_encoder", revision=args.revision
+        args.pretrained_model_name_or_path, subfolder="text_encoder", variant=args.variant
     )
-    vae = AutoencoderKL.from_pretrained(args.pretrained_model_name_or_path, subfolder="vae", revision=args.revision)
+    vae = AutoencoderKL.from_pretrained(args.pretrained_model_name_or_path, subfolder="vae", variant=args.variant)
     unet = UNet2DConditionModel.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="unet", revision=args.non_ema_revision
+        args.pretrained_model_name_or_path, subfolder="unet", variant=args.non_ema_variant
     )
 
     # Freeze vae and text_encoder
@@ -412,7 +412,7 @@ def main():
     # Create EMA for the unet.
     if args.use_ema:
         ema_unet = UNet2DConditionModel.from_pretrained(
-            args.pretrained_model_name_or_path, subfolder="unet", revision=args.revision
+            args.pretrained_model_name_or_path, subfolder="unet", variant=args.variant
         )
         ema_unet = EMAModel(ema_unet.parameters(), model_cls=UNet2DConditionModel, model_config=ema_unet.config)
 
@@ -781,7 +781,7 @@ def main():
             text_encoder=text_encoder,
             vae=vae,
             unet=unet,
-            revision=args.revision,
+            variant=args.variant,
         )
         pipeline.save_pretrained(args.output_dir)
 

@@ -33,7 +33,7 @@ from . import DIFFUSERS_DYNAMIC_MODULE_NAME, HF_MODULES_CACHE, logging
 
 
 COMMUNITY_PIPELINES_URL = (
-    "https://raw.githubusercontent.com/huggingface/diffusers/{revision}/examples/community/{pipeline}.py"
+    "https://raw.githubusercontent.com/huggingface/diffusers/{variant}/examples/community/{pipeline}.py"
 )
 
 
@@ -202,7 +202,7 @@ def get_cached_module_file(
     resume_download: bool = False,
     proxies: Optional[Dict[str, str]] = None,
     use_auth_token: Optional[Union[bool, str]] = None,
-    revision: Optional[str] = None,
+    variant: Optional[str] = None,
     local_files_only: bool = False,
 ):
     """
@@ -235,9 +235,9 @@ def get_cached_module_file(
         use_auth_token (`str` or *bool*, *optional*):
             The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
             when running `transformers-cli login` (stored in `~/.huggingface`).
-        revision (`str`, *optional*, defaults to `"main"`):
+        variant (`str`, *optional*, defaults to `"main"`):
             The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-            git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+            git-based system for storing models and other artifacts on huggingface.co, so `variant` can be any
             identifier allowed by git.
         local_files_only (`bool`, *optional*, defaults to `False`):
             If `True`, will only try to load the tokenizer configuration from local files.
@@ -266,21 +266,21 @@ def get_cached_module_file(
         latest_version = "v" + ".".join(__version__.split(".")[:3])
 
         # retrieve github version that matches
-        if revision is None:
-            revision = latest_version if latest_version in available_versions else "main"
-            logger.info(f"Defaulting to latest_version: {revision}.")
-        elif revision in available_versions:
-            revision = f"v{revision}"
-        elif revision == "main":
-            revision = revision
+        if variant is None:
+            variant = latest_version if latest_version in available_versions else "main"
+            logger.info(f"Defaulting to latest_version: {variant}.")
+        elif variant in available_versions:
+            variant = f"v{variant}"
+        elif variant == "main":
+            variant = variant
         else:
             raise ValueError(
-                f"`custom_revision`: {revision} does not exist. Please make sure to choose one of"
+                f"`custom_variant`: {variant} does not exist. Please make sure to choose one of"
                 f" {', '.join(available_versions + ['main'])}."
             )
 
         # community pipeline on GitHub
-        github_url = COMMUNITY_PIPELINES_URL.format(revision=revision, pipeline=pretrained_model_name_or_path)
+        github_url = COMMUNITY_PIPELINES_URL.format(variant=variant, pipeline=pretrained_model_name_or_path)
         try:
             resolved_module_file = cached_download(
                 github_url,
@@ -339,7 +339,7 @@ def get_cached_module_file(
         else:
             token = None
 
-        commit_hash = model_info(pretrained_model_name_or_path, revision=revision, token=token).sha
+        commit_hash = model_info(pretrained_model_name_or_path, variant=variant, token=token).sha
 
         # The module file will end up being placed in a subfolder with the git hash of the repo. This way we get the
         # benefit of versioning.
@@ -360,7 +360,7 @@ def get_cached_module_file(
                     resume_download=resume_download,
                     proxies=proxies,
                     use_auth_token=use_auth_token,
-                    revision=revision,
+                    variant=variant,
                     local_files_only=local_files_only,
                 )
     return os.path.join(full_submodule, module_file)
@@ -375,7 +375,7 @@ def get_class_from_dynamic_module(
     resume_download: bool = False,
     proxies: Optional[Dict[str, str]] = None,
     use_auth_token: Optional[Union[bool, str]] = None,
-    revision: Optional[str] = None,
+    variant: Optional[str] = None,
     local_files_only: bool = False,
     **kwargs,
 ):
@@ -417,9 +417,9 @@ def get_class_from_dynamic_module(
         use_auth_token (`str` or `bool`, *optional*):
             The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
             when running `transformers-cli login` (stored in `~/.huggingface`).
-        revision (`str`, *optional*, defaults to `"main"`):
+        variant (`str`, *optional*, defaults to `"main"`):
             The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-            git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+            git-based system for storing models and other artifacts on huggingface.co, so `variant` can be any
             identifier allowed by git.
         local_files_only (`bool`, *optional*, defaults to `False`):
             If `True`, will only try to load the tokenizer configuration from local files.
@@ -450,7 +450,7 @@ def get_class_from_dynamic_module(
         resume_download=resume_download,
         proxies=proxies,
         use_auth_token=use_auth_token,
-        revision=revision,
+        variant=variant,
         local_files_only=local_files_only,
     )
     return get_class_in_module(class_name, final_module.replace(".py", ""))

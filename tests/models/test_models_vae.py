@@ -186,14 +186,14 @@ class AutoencoderKLIntegrationTests(unittest.TestCase):
         return image
 
     def get_sd_vae_model(self, model_id="CompVis/stable-diffusion-v1-4", fp16=False):
-        revision = "fp16" if fp16 else None
+        variant = "fp16" if fp16 else None
         torch_dtype = torch.float16 if fp16 else torch.float32
 
         model = AutoencoderKL.from_pretrained(
             model_id,
             subfolder="vae",
             torch_dtype=torch_dtype,
-            revision=revision,
+            variant=variant,
         )
         model.to(torch_device).eval()
 

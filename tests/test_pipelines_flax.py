@@ -90,7 +90,7 @@ class FlaxPipelineTests(unittest.TestCase):
 
     def test_stable_diffusion_v1_4(self):
         pipeline, params = FlaxStableDiffusionPipeline.from_pretrained(
-            "CompVis/stable-diffusion-v1-4", revision="flax", safety_checker=None
+            "CompVis/stable-diffusion-v1-4", variant="flax", safety_checker=None
         )
 
         prompt = (
@@ -121,7 +121,7 @@ class FlaxPipelineTests(unittest.TestCase):
 
     def test_stable_diffusion_v1_4_bfloat_16(self):
         pipeline, params = FlaxStableDiffusionPipeline.from_pretrained(
-            "CompVis/stable-diffusion-v1-4", revision="bf16", dtype=jnp.bfloat16, safety_checker=None
+            "CompVis/stable-diffusion-v1-4", variant="bf16", dtype=jnp.bfloat16, safety_checker=None
         )
 
         prompt = (
@@ -152,7 +152,7 @@ class FlaxPipelineTests(unittest.TestCase):
 
     def test_stable_diffusion_v1_4_bfloat_16_with_safety(self):
         pipeline, params = FlaxStableDiffusionPipeline.from_pretrained(
-            "CompVis/stable-diffusion-v1-4", revision="bf16", dtype=jnp.bfloat16
+            "CompVis/stable-diffusion-v1-4", variant="bf16", dtype=jnp.bfloat16
         )
 
         prompt = (
@@ -190,7 +190,7 @@ class FlaxPipelineTests(unittest.TestCase):
 
         pipeline, params = FlaxStableDiffusionPipeline.from_pretrained(
             "CompVis/stable-diffusion-v1-4",
-            revision="bf16",
+            variant="bf16",
             dtype=jnp.bfloat16,
             scheduler=scheduler,
             safety_checker=None,

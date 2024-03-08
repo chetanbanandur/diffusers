@@ -40,7 +40,7 @@ from ..models.modeling_utils import _LOW_CPU_MEM_USAGE_DEFAULT
 from ..schedulers.scheduling_utils import SCHEDULER_CONFIG_NAME
 from ..utils import (
     CONFIG_NAME,
-    DEPRECATED_REVISION_ARGS,
+    DEPRECATED_variant_ARGS,
     DIFFUSERS_CACHE,
     HF_HUB_OFFLINE,
     SAFETENSORS_WEIGHTS_NAME,
@@ -219,24 +219,24 @@ def variant_compatible_siblings(filenames, variant=None) -> Union[List[os.PathLi
     return usable_filenames, variant_filenames
 
 
-def warn_deprecated_model_variant(pretrained_model_name_or_path, use_auth_token, variant, revision, model_filenames):
+def warn_deprecated_model_variant(pretrained_model_name_or_path, use_auth_token, variant, variant, model_filenames):
     info = model_info(
         pretrained_model_name_or_path,
         use_auth_token=use_auth_token,
-        revision=None,
+        variant=None,
     )
     filenames = set(sibling.rfilename for sibling in info.siblings)
-    comp_model_filenames, _ = variant_compatible_siblings(filenames, variant=revision)
+    comp_model_filenames, _ = variant_compatible_siblings(filenames, variant=variant)
     comp_model_filenames = [".".join(f.split(".")[:1] + f.split(".")[2:]) for f in comp_model_filenames]
 
     if set(comp_model_filenames) == set(model_filenames):
         warnings.warn(
-            f"You are loading the variant {revision} from {pretrained_model_name_or_path} via `revision='{revision}'` even though you can load it via `variant=`{revision}`. Loading model variants via `revision='{revision}'` is deprecated and will be removed in diffusers v1. Please use `variant='{revision}'` instead.",
+            f"You are loading the variant {variant} from {pretrained_model_name_or_path} via `variant='{variant}'` even though you can load it via `variant=`{variant}`. Loading model variants via `variant='{variant}'` is deprecated and will be removed in diffusers v1. Please use `variant='{variant}'` instead.",
             FutureWarning,
         )
     else:
         warnings.warn(
-            f"You are loading the variant {revision} from {pretrained_model_name_or_path} via `revision='{revision}'`. This behavior is deprecated and will be removed in diffusers v1. One should use `variant='{revision}'` instead. However, it appears that {pretrained_model_name_or_path} currently does not have the required variant filenames in the 'main' branch. \n The Diffusers team and community would be very grateful if you could open an issue: https://github.com/huggingface/diffusers/issues/new with the title '{pretrained_model_name_or_path} is missing {revision} files' so that the correct variant file can be added.",
+            f"You are loading the variant {variant} from {pretrained_model_name_or_path} via `variant='{variant}'`. This behavior is deprecated and will be removed in diffusers v1. One should use `variant='{variant}'` instead. However, it appears that {pretrained_model_name_or_path} currently does not have the required variant filenames in the 'main' branch. \n The Diffusers team and community would be very grateful if you could open an issue: https://github.com/huggingface/diffusers/issues/new with the title '{pretrained_model_name_or_path} is missing {variant} files' so that the correct variant file can be added.",
             FutureWarning,
         )
 
@@ -674,13 +674,13 @@ class DiffusionPipeline(ConfigMixin):
             use_auth_token (`str` or *bool*, *optional*):
                 The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
                 when running `huggingface-cli login` (stored in `~/.huggingface`).
-            revision (`str`, *optional*, defaults to `"main"`):
+            variant (`str`, *optional*, defaults to `"main"`):
                 The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-                git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+                git-based system for storing models and other artifacts on huggingface.co, so `variant` can be any
                 identifier allowed by git.
-            custom_revision (`str`, *optional*, defaults to `"main"` when loading from the Hub and to local version of `diffusers` when loading from GitHub):
+            custom_variant (`str`, *optional*, defaults to `"main"` when loading from the Hub and to local version of `diffusers` when loading from GitHub):
                 The specific model version to use. It can be a branch name, a tag name, or a commit id similar to
-                `revision` when loading a custom pipeline from the Hub. It can be a diffusers version when loading a
+                `variant` when loading a custom pipeline from the Hub. It can be a diffusers version when loading a
                 custom pipeline from GitHub.
             mirror (`str`, *optional*):
                 Mirror source to accelerate downloads in China. If you are from China and have an accessibility
@@ -751,11 +751,11 @@ class DiffusionPipeline(ConfigMixin):
         proxies = kwargs.pop("proxies", None)
         local_files_only = kwargs.pop("local_files_only", HF_HUB_OFFLINE)
         use_auth_token = kwargs.pop("use_auth_token", None)
-        revision = kwargs.pop("revision", None)
+        variant = kwargs.pop("variant", None)
         from_flax = kwargs.pop("from_flax", False)
         torch_dtype = kwargs.pop("torch_dtype", None)
         custom_pipeline = kwargs.pop("custom_pipeline", None)
-        custom_revision = kwargs.pop("custom_revision", None)
+        custom_variant = kwargs.pop("custom_variant", None)
         provider = kwargs.pop("provider", None)
         sess_options = kwargs.pop("sess_options", None)
         device_map = kwargs.pop("device_map", None)
@@ -774,7 +774,7 @@ class DiffusionPipeline(ConfigMixin):
                 proxies=proxies,
                 local_files_only=local_files_only,
                 use_auth_token=use_auth_token,
-                revision=revision,
+                variant=variant,
                 from_flax=from_flax,
                 custom_pipeline=custom_pipeline,
                 variant=variant,
@@ -808,7 +808,7 @@ class DiffusionPipeline(ConfigMixin):
                 file_name = CUSTOM_PIPELINE_FILE_NAME
 
             pipeline_class = get_class_from_dynamic_module(
-                custom_pipeline, module_file=file_name, cache_dir=cache_dir, revision=custom_revision
+                custom_pipeline, module_file=file_name, cache_dir=cache_dir, variant=custom_variant
             )
         elif cls != DiffusionPipeline:
             pipeline_class = cls
@@ -1043,14 +1043,14 @@ class DiffusionPipeline(ConfigMixin):
             use_auth_token (`str` or *bool*, *optional*):
                 The token to use as HTTP bearer authorization for remote files. If `True`, will use the token generated
                 when running `huggingface-cli login` (stored in `~/.huggingface`).
-            revision (`str`, *optional*, defaults to `"main"`):
+            variant (`str`, *optional*, defaults to `"main"`):
                 The specific model version to use. It can be a branch name, a tag name, or a commit id, since we use a
-                git-based system for storing models and other artifacts on huggingface.co, so `revision` can be any
+                git-based system for storing models and other artifacts on huggingface.co, so `variant` can be any
                 identifier allowed by git.
-            custom_revision (`str`, *optional*, defaults to `"main"` when loading from the Hub and to local version of
+            custom_variant (`str`, *optional*, defaults to `"main"` when loading from the Hub and to local version of
             `diffusers` when loading from GitHub):
                 The specific model version to use. It can be a branch name, a tag name, or a commit id similar to
-                `revision` when loading a custom pipeline from the Hub. It can be a diffusers version when loading a
+                `variant` when loading a custom pipeline from the Hub. It can be a diffusers version when loading a
                 custom pipeline from GitHub.
             mirror (`str`, *optional*):
                 Mirror source to accelerate downloads in China. If you are from China and have an accessibility
@@ -1074,7 +1074,7 @@ class DiffusionPipeline(ConfigMixin):
         proxies = kwargs.pop("proxies", None)
         local_files_only = kwargs.pop("local_files_only", HF_HUB_OFFLINE)
         use_auth_token = kwargs.pop("use_auth_token", None)
-        revision = kwargs.pop("revision", None)
+        variant = kwargs.pop("variant", None)
         from_flax = kwargs.pop("from_flax", False)
         custom_pipeline = kwargs.pop("custom_pipeline", None)
         variant = kwargs.pop("variant", None)
@@ -1099,7 +1099,7 @@ class DiffusionPipeline(ConfigMixin):
                 pretrained_model_name,
                 cls.config_name,
                 cache_dir=cache_dir,
-                revision=revision,
+                variant=variant,
                 proxies=proxies,
                 force_download=force_download,
                 resume_download=resume_download,
@@ -1108,7 +1108,7 @@ class DiffusionPipeline(ConfigMixin):
             info = model_info(
                 pretrained_model_name,
                 use_auth_token=use_auth_token,
-                revision=revision,
+                variant=variant,
             )
 
             config_dict = cls._dict_from_json_file(config_file)
@@ -1119,11 +1119,11 @@ class DiffusionPipeline(ConfigMixin):
             model_filenames, variant_filenames = variant_compatible_siblings(filenames, variant=variant)
 
             # if the whole pipeline is cached we don't have to ping the Hub
-            if revision in DEPRECATED_REVISION_ARGS and version.parse(
+            if variant in DEPRECATED_variant_ARGS and version.parse(
                 version.parse(__version__).base_version
             ) >= version.parse("0.17.0"):
                 warn_deprecated_model_variant(
-                    pretrained_model_name, use_auth_token, variant, revision, model_filenames
+                    pretrained_model_name, use_auth_token, variant, variant, model_filenames
                 )
 
             model_folder_names = set([os.path.split(f)[0] for f in model_filenames])
@@ -1202,7 +1202,7 @@ class DiffusionPipeline(ConfigMixin):
             proxies=proxies,
             local_files_only=local_files_only,
             use_auth_token=use_auth_token,
-            revision=revision,
+            variant=variant,
             allow_patterns=allow_patterns,
             ignore_patterns=ignore_patterns,
             user_agent=user_agent,

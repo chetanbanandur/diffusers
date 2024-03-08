@@ -93,11 +93,11 @@ def parse_args():
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
     parser.add_argument(
-        "--revision",
+        "--variant",
         type=str,
         default=None,
         required=False,
-        help="Revision of pretrained model identifier from huggingface.co/models.",
+        help="variant of pretrained model identifier from huggingface.co/models.",
     )
     parser.add_argument(
         "--dataset_name",
@@ -460,14 +460,14 @@ def main():
     # Load scheduler, tokenizer and models.
     noise_scheduler = DDPMScheduler.from_pretrained(args.pretrained_model_name_or_path, subfolder="scheduler")
     tokenizer = CLIPTokenizer.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="tokenizer", revision=args.revision
+        args.pretrained_model_name_or_path, subfolder="tokenizer", variant=args.variant
     )
     text_encoder = CLIPTextModel.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="text_encoder", revision=args.revision
+        args.pretrained_model_name_or_path, subfolder="text_encoder", variant=args.variant
     )
-    vae = AutoencoderKL.from_pretrained(args.pretrained_model_name_or_path, subfolder="vae", revision=args.revision)
+    vae = AutoencoderKL.from_pretrained(args.pretrained_model_name_or_path, subfolder="vae", variant=args.variant)
     unet = UNet2DConditionModel.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="unet", revision=args.revision
+        args.pretrained_model_name_or_path, subfolder="unet", variant=args.variant
     )
 
     # For mixed precision training we cast the text_encoder and vae weights to half-precision
@@ -885,7 +885,7 @@ def main():
                     args.pretrained_model_name_or_path,
                     unet=accelerator.unwrap_model(unet),
                     text_encoder=accelerator.unwrap_model(text_encoder),
-                    revision=args.revision,
+                    variant=args.variant,
                     torch_dtype=weight_dtype,
                 )
                 pipeline = pipeline.to(accelerator.device)
@@ -956,7 +956,7 @@ def main():
     # Final inference
     # Load previous pipeline
     pipeline = DiffusionPipeline.from_pretrained(
-        args.pretrained_model_name_or_path, revision=args.revision, torch_dtype=weight_dtype
+        args.pretrained_model_name_or_path, variant=args.variant, torch_dtype=weight_dtype
     )
 
     if args.use_peft:

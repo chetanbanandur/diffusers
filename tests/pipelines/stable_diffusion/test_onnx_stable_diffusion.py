@@ -158,7 +158,7 @@ class OnnxStableDiffusionPipelineIntegrationTests(unittest.TestCase):
         # using the PNDM scheduler by default
         sd_pipe = OnnxStableDiffusionPipeline.from_pretrained(
             "CompVis/stable-diffusion-v1-4",
-            revision="onnx",
+            variant="onnx",
             safety_checker=None,
             feature_extractor=None,
             provider=self.gpu_provider,
@@ -180,11 +180,11 @@ class OnnxStableDiffusionPipelineIntegrationTests(unittest.TestCase):
 
     def test_inference_ddim(self):
         ddim_scheduler = DDIMScheduler.from_pretrained(
-            "runwayml/stable-diffusion-v1-5", subfolder="scheduler", revision="onnx"
+            "runwayml/stable-diffusion-v1-5", subfolder="scheduler", variant="onnx"
         )
         sd_pipe = OnnxStableDiffusionPipeline.from_pretrained(
             "runwayml/stable-diffusion-v1-5",
-            revision="onnx",
+            variant="onnx",
             scheduler=ddim_scheduler,
             safety_checker=None,
             feature_extractor=None,
@@ -206,11 +206,11 @@ class OnnxStableDiffusionPipelineIntegrationTests(unittest.TestCase):
 
     def test_inference_k_lms(self):
         lms_scheduler = LMSDiscreteScheduler.from_pretrained(
-            "runwayml/stable-diffusion-v1-5", subfolder="scheduler", revision="onnx"
+            "runwayml/stable-diffusion-v1-5", subfolder="scheduler", variant="onnx"
         )
         sd_pipe = OnnxStableDiffusionPipeline.from_pretrained(
             "runwayml/stable-diffusion-v1-5",
-            revision="onnx",
+            variant="onnx",
             scheduler=lms_scheduler,
             safety_checker=None,
             feature_extractor=None,
@@ -258,7 +258,7 @@ class OnnxStableDiffusionPipelineIntegrationTests(unittest.TestCase):
 
         pipe = OnnxStableDiffusionPipeline.from_pretrained(
             "runwayml/stable-diffusion-v1-5",
-            revision="onnx",
+            variant="onnx",
             safety_checker=None,
             feature_extractor=None,
             provider=self.gpu_provider,
@@ -283,7 +283,7 @@ class OnnxStableDiffusionPipelineIntegrationTests(unittest.TestCase):
     def test_stable_diffusion_no_safety_checker(self):
         pipe = OnnxStableDiffusionPipeline.from_pretrained(
             "runwayml/stable-diffusion-v1-5",
-            revision="onnx",
+            variant="onnx",
             safety_checker=None,
             feature_extractor=None,
             provider=self.gpu_provider,

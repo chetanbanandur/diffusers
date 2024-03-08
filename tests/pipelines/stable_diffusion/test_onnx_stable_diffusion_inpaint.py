@@ -69,7 +69,7 @@ class OnnxStableDiffusionInpaintPipelineIntegrationTests(unittest.TestCase):
         )
         pipe = OnnxStableDiffusionInpaintPipeline.from_pretrained(
             "runwayml/stable-diffusion-inpainting",
-            revision="onnx",
+            variant="onnx",
             safety_checker=None,
             feature_extractor=None,
             provider=self.gpu_provider,
@@ -107,11 +107,11 @@ class OnnxStableDiffusionInpaintPipelineIntegrationTests(unittest.TestCase):
             "/in_paint/overture-creations-5sI6fQgYIuo_mask.png"
         )
         lms_scheduler = LMSDiscreteScheduler.from_pretrained(
-            "runwayml/stable-diffusion-inpainting", subfolder="scheduler", revision="onnx"
+            "runwayml/stable-diffusion-inpainting", subfolder="scheduler", variant="onnx"
         )
         pipe = OnnxStableDiffusionInpaintPipeline.from_pretrained(
             "runwayml/stable-diffusion-inpainting",
-            revision="onnx",
+            variant="onnx",
             scheduler=lms_scheduler,
             safety_checker=None,
             feature_extractor=None,
